@@ -15,19 +15,21 @@ export default function Navbar() {
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center gap-8">
             <Link href="/dashboard" className="flex items-center gap-2">
-              {!logoError ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src="/logo.png"
-                  alt="Neu Luma"
-                  className="h-8 w-auto"
-                  onError={() => setLogoError(true)}
-                />
-              ) : (
-                <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">NL</span>
-                </div>
-              )}
+              <div className="h-9 w-auto rounded-lg overflow-hidden bg-black flex items-center justify-center">
+                {!logoError ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src="/logo.png"
+                    alt="Neu Luma"
+                    className="h-9 w-auto object-contain"
+                    onError={() => setLogoError(true)}
+                  />
+                ) : (
+                  <div className="px-2">
+                    <span className="text-white font-bold text-sm">NL</span>
+                  </div>
+                )}
+              </div>
               <span className="font-semibold text-white text-lg">
                 Client Portal
               </span>

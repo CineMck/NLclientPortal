@@ -60,19 +60,21 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-surface-900 px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          {!logoError ? (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src="/logo.png"
-              alt="Neu Luma"
-              className="h-14 mx-auto mb-4"
-              onError={() => setLogoError(true)}
-            />
-          ) : (
-            <div className="inline-flex items-center justify-center w-14 h-14 bg-brand-600 rounded-2xl mb-4">
-              <span className="text-white font-bold text-xl">NL</span>
-            </div>
-          )}
+          <div className="inline-flex h-16 w-auto rounded-xl overflow-hidden bg-black items-center justify-center mb-4">
+            {!logoError ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src="/logo.png"
+                alt="Neu Luma"
+                className="h-16 w-auto object-contain"
+                onError={() => setLogoError(true)}
+              />
+            ) : (
+              <div className="px-3">
+                <span className="text-white font-bold text-xl">NL</span>
+              </div>
+            )}
+          </div>
           <h1 className="text-2xl font-bold text-white">Create an account</h1>
           <p className="text-gray-400 mt-1">Get started with the client portal</p>
         </div>
