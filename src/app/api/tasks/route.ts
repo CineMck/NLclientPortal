@@ -14,18 +14,40 @@ export async function GET() {
 
   const db = getDb();
   const userId = (session.user as { id?: string }).id;
+  const companyId = (session.user as { companyId?: string | null }).companyId;
 
-  const tasks = db
-    .prepare(
-      `SELECT t.*,
-        GROUP_CONCAT(a.filename) as attachment_names
-       FROM tasks t
-       LEFT JOIN attachments a ON a.task_id = t.id
-       WHERE t.user_id = ?
-       GROUP BY t.id
-       ORDER BY t.created_at DESC`
-    )
-    .all(userId);
+  let tasks;
+  if (companyId) {
+    // Company-scoped: show all tasks from users in the same company
+    tasks = db
+      .prepare(
+        `SELECT t.*,
+          GROUP_CONCAT(a.filename) as attachment_names,
+          u.name as submitter_name
+         FROM tasks t
+         LEFT JOIN attachments a ON a.task_id = t.id
+         JOIN users u ON u.id = t.user_id
+         WHERE u.company_id = ?
+         GROUP BY t.id
+         ORDER BY t.created_at DESC`
+      )
+      .all(companyId);
+  } else {
+    // No company: show only own tasks
+    tasks = db
+      .prepare(
+        `SELECT t.*,
+          GROUP_CONCAT(a.filename) as attachment_names,
+          u.name as submitter_name
+         FROM tasks t
+         LEFT JOIN attachments a ON a.task_id = t.id
+         JOIN users u ON u.id = t.user_id
+         WHERE t.user_id = ?
+         GROUP BY t.id
+         ORDER BY t.created_at DESC`
+      )
+      .all(userId);
+  }
 
   return NextResponse.json({ tasks });
 }
@@ -67,7 +89,6 @@ export async function POST(request: NextRequest) {
       clickupTaskId = clickupTask.id;
     } catch (error) {
       console.error("ClickUp task creation failed:", error);
-      // Continue even if ClickUp fails - store locally
     }
 
     // Store task in local DB
@@ -107,7 +128,6 @@ export async function POST(request: NextRequest) {
             "INSERT INTO attachments (task_id, filename, filepath, mimetype) VALUES (?, ?, ?, ?)"
           ).run(Number(taskId), file.name, filePath, file.type);
 
-          // Upload to ClickUp if task was created there
           if (clickupTaskId) {
             try {
               await uploadAttachmentToClickUp(clickupTaskId, filePath, file.name);
@@ -135,7 +155,6 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error("Task creation error:", error);
-    // If ClickUp task was already created, let the user know the task exists there
     if (clickupTaskId) {
       return NextResponse.json(
         {

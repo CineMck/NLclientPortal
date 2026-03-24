@@ -60,19 +60,19 @@ export default function CommentSection({ taskId }: { taskId: number }) {
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Comments</h3>
+      <h3 className="text-lg font-semibold text-white mb-4">Comments</h3>
 
       {loading ? (
         <div className="space-y-3">
           {[1, 2].map((i) => (
             <div key={i} className="animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
-              <div className="h-10 bg-gray-100 rounded"></div>
+              <div className="h-4 bg-gray-700 rounded w-24 mb-2"></div>
+              <div className="h-10 bg-gray-800 rounded"></div>
             </div>
           ))}
         </div>
       ) : comments.length === 0 ? (
-        <p className="text-sm text-gray-500 py-4">
+        <p className="text-sm text-gray-400 py-4">
           No comments yet. Start the conversation below.
         </p>
       ) : (
@@ -82,24 +82,24 @@ export default function CommentSection({ taskId }: { taskId: number }) {
               key={comment.id}
               className={`rounded-lg p-4 ${
                 comment.source === "portal"
-                  ? "bg-brand-50 border border-brand-100"
-                  : "bg-gray-50 border border-gray-200"
+                  ? "bg-brand-900/20 border border-brand-500/20"
+                  : "bg-surface-700 border border-gray-600/50"
               }`}
             >
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm font-medium text-white">
                   {comment.author_name}
                 </span>
                 {comment.source === "clickup" && (
-                  <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">
+                  <span className="text-xs bg-purple-900/50 text-purple-300 px-1.5 py-0.5 rounded">
                     ClickUp
                   </span>
                 )}
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-gray-500">
                   {new Date(comment.created_at).toLocaleString()}
                 </span>
               </div>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">
+              <p className="text-sm text-gray-300 whitespace-pre-wrap">
                 {comment.content}
               </p>
             </div>
@@ -114,7 +114,7 @@ export default function CommentSection({ taskId }: { taskId: number }) {
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Write a comment..."
-          className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-gray-900"
+          className="flex-1 px-4 py-2.5 bg-surface-700 border border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-white placeholder-gray-500"
         />
         <button
           type="submit"

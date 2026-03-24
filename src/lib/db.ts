@@ -17,13 +17,22 @@ function getDb(): Database.Database {
 
 function initializeDb(db: Database.Database) {
   db.exec(`
+    CREATE TABLE IF NOT EXISTS companies (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL UNIQUE,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL,
       company TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      company_id INTEGER,
+      role TEXT NOT NULL DEFAULT 'client',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (company_id) REFERENCES companies(id)
     );
 
     CREATE TABLE IF NOT EXISTS tasks (
@@ -80,6 +89,10 @@ function initializeDb(db: Database.Database) {
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
   `);
+
+  // Migrate existing databases: add new columns if they don't exist
+  try { db.exec("ALTER TABLE users ADD COLUMN company_id INTEGER REFERENCES companies(id)"); } catch {}
+  try { db.exec("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'client'"); } catch {}
 }
 
 export default getDb;

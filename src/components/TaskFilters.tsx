@@ -22,12 +22,12 @@ export default function TaskFilters({
   onSortByChange,
 }: TaskFiltersProps) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+    <div className="bg-surface-800 rounded-xl border border-gray-700/50 p-4 mb-4">
       <div className="flex flex-col sm:flex-row gap-3">
         {/* Search */}
         <div className="flex-1 relative">
           <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -44,7 +44,7 @@ export default function TaskFilters({
             placeholder="Search tasks..."
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-gray-900"
+            className="w-full pl-10 pr-4 py-2 bg-surface-700 border border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-white placeholder-gray-500"
           />
         </div>
 
@@ -52,7 +52,7 @@ export default function TaskFilters({
         <select
           value={statusFilter}
           onChange={(e) => onStatusFilterChange(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-700 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+          className="px-3 py-2 bg-surface-700 border border-gray-600 rounded-lg text-sm text-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
         >
           <option value="all">All Statuses</option>
           <option value="to do">To Do</option>
@@ -67,7 +67,7 @@ export default function TaskFilters({
         <select
           value={urgencyFilter}
           onChange={(e) => onUrgencyFilterChange(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-700 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+          className="px-3 py-2 bg-surface-700 border border-gray-600 rounded-lg text-sm text-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
         >
           <option value="all">All Urgency</option>
           <option value="low">Low</option>
@@ -80,7 +80,7 @@ export default function TaskFilters({
         <select
           value={sortBy}
           onChange={(e) => onSortByChange(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-700 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+          className="px-3 py-2 bg-surface-700 border border-gray-600 rounded-lg text-sm text-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
         >
           <option value="newest">Newest First</option>
           <option value="oldest">Oldest First</option>

@@ -9,13 +9,13 @@ interface StatusChange {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  "to do": "bg-gray-100 text-gray-700",
-  "in progress": "bg-blue-100 text-blue-700",
-  "in review": "bg-yellow-100 text-yellow-700",
-  complete: "bg-green-100 text-green-700",
-  closed: "bg-green-100 text-green-700",
-  done: "bg-green-100 text-green-700",
-  open: "bg-gray-100 text-gray-700",
+  "to do": "bg-gray-800 text-gray-300",
+  "in progress": "bg-blue-900/50 text-blue-300",
+  "in review": "bg-yellow-900/50 text-yellow-300",
+  complete: "bg-green-900/50 text-green-300",
+  closed: "bg-green-900/50 text-green-300",
+  done: "bg-green-900/50 text-green-300",
+  open: "bg-gray-800 text-gray-300",
 };
 
 export default function StatusHistory({
@@ -27,15 +27,15 @@ export default function StatusHistory({
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <h3 className="text-lg font-semibold text-white mb-4">
         Status History
       </h3>
       <div className="relative">
-        <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-200" />
+        <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-700" />
         <div className="space-y-4">
           {history.map((change) => (
             <div key={change.id} className="relative flex items-start gap-3 pl-8">
-              <div className="absolute left-1.5 top-1.5 w-3 h-3 rounded-full bg-brand-500 border-2 border-white" />
+              <div className="absolute left-1.5 top-1.5 w-3 h-3 rounded-full bg-brand-500 border-2 border-surface-800" />
               <div>
                 <div className="flex items-center gap-2">
                   {change.old_status && (
@@ -47,7 +47,7 @@ export default function StatusHistory({
                       >
                         {change.old_status}
                       </span>
-                      <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </>
@@ -60,7 +60,7 @@ export default function StatusHistory({
                     {change.new_status}
                   </span>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   {new Date(change.changed_at).toLocaleString()}
                 </p>
               </div>

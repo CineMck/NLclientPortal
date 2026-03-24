@@ -4,7 +4,7 @@ import getDb from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password, company } = await request.json();
+    const { name, email, password } = await request.json();
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -30,9 +30,9 @@ export async function POST(request: NextRequest) {
 
     const result = db
       .prepare(
-        "INSERT INTO users (name, email, password, company) VALUES (?, ?, ?, ?)"
+        "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'client')"
       )
-      .run(name, email, hashedPassword, company || null);
+      .run(name, email, hashedPassword);
 
     return NextResponse.json(
       { message: "Account created successfully", userId: result.lastInsertRowid },

@@ -74,7 +74,7 @@ export default function FilePreview({
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <h3 className="text-lg font-semibold text-white mb-4">
         Attachments ({attachments.length})
       </h3>
 
@@ -88,11 +88,11 @@ export default function FilePreview({
           return (
             <div
               key={attachment.id}
-              className="border border-gray-200 rounded-lg overflow-hidden group"
+              className="border border-gray-700/50 rounded-lg overflow-hidden group"
             >
               {type === "image" ? (
                 <div
-                  className="aspect-square bg-gray-100 cursor-pointer relative"
+                  className="aspect-square bg-surface-700 cursor-pointer relative"
                   onClick={() => setPreviewId(attachment.id)}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -101,7 +101,7 @@ export default function FilePreview({
                     alt={attachment.filename}
                     className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
                   />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
                     <svg
                       className="w-8 h-8 text-white"
                       fill="none"
@@ -119,25 +119,25 @@ export default function FilePreview({
                 </div>
               ) : (
                 <div
-                  className={`aspect-square bg-gray-50 flex flex-col items-center justify-center ${canPreview ? "cursor-pointer" : ""}`}
+                  className={`aspect-square bg-surface-700 flex flex-col items-center justify-center ${canPreview ? "cursor-pointer" : ""}`}
                   onClick={() => canPreview && setPreviewId(attachment.id)}
                 >
-                  <div className="text-gray-400 mb-2">
+                  <div className="text-gray-500 mb-2">
                     <FileIcon type={type} />
                   </div>
-                  <span className="text-xs text-gray-500 uppercase font-medium">
+                  <span className="text-xs text-gray-400 uppercase font-medium">
                     {attachment.filename.split(".").pop()}
                   </span>
                 </div>
               )}
-              <div className="px-2 py-1.5 bg-white border-t border-gray-100">
-                <p className="text-xs text-gray-600 truncate" title={attachment.filename}>
+              <div className="px-2 py-1.5 bg-surface-800 border-t border-gray-700/50">
+                <p className="text-xs text-gray-400 truncate" title={attachment.filename}>
                   {attachment.filename}
                 </p>
                 <a
                   href={url}
                   download={attachment.filename}
-                  className="text-xs text-brand-600 hover:text-brand-700 font-medium"
+                  className="text-xs text-brand-400 hover:text-brand-300 font-medium"
                   onClick={(e) => e.stopPropagation()}
                 >
                   Download
@@ -151,28 +151,28 @@ export default function FilePreview({
       {/* Preview Modal */}
       {previewAttachment && previewType && (
         <div
-          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
           onClick={() => setPreviewId(null)}
         >
           <div
-            className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-auto"
+            className="bg-surface-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-auto border border-gray-700/50"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-4 border-b">
-              <h4 className="font-medium text-gray-900 truncate">
+            <div className="flex items-center justify-between p-4 border-b border-gray-700/50">
+              <h4 className="font-medium text-white truncate">
                 {previewAttachment.filename}
               </h4>
               <div className="flex items-center gap-2">
                 <a
                   href={`/api/tasks/${taskId}/attachments/${previewAttachment.id}`}
                   download={previewAttachment.filename}
-                  className="text-sm text-brand-600 hover:text-brand-700 font-medium"
+                  className="text-sm text-brand-400 hover:text-brand-300 font-medium"
                 >
                   Download
                 </a>
                 <button
                   onClick={() => setPreviewId(null)}
-                  className="text-gray-400 hover:text-gray-600 p-1"
+                  className="text-gray-500 hover:text-gray-300 p-1"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

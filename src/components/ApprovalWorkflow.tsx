@@ -44,10 +44,10 @@ export default function ApprovalWorkflow({
   }
 
   return (
-    <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-5">
+    <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-xl p-5">
       <div className="flex items-center gap-2 mb-3">
         <svg
-          className="w-5 h-5 text-yellow-600"
+          className="w-5 h-5 text-yellow-400"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -59,11 +59,11 @@ export default function ApprovalWorkflow({
             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <h3 className="text-base font-semibold text-yellow-800">
+        <h3 className="text-base font-semibold text-yellow-300">
           Ready for Your Review
         </h3>
       </div>
-      <p className="text-sm text-yellow-700 mb-4">
+      <p className="text-sm text-yellow-300/70 mb-4">
         This task is ready for your review. Please approve or request revisions.
       </p>
 
@@ -79,7 +79,7 @@ export default function ApprovalWorkflow({
           <button
             onClick={() => setShowRevisionForm(true)}
             disabled={submitting}
-            className="flex-1 bg-white text-orange-700 border border-orange-300 py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-orange-50 disabled:opacity-50 transition-colors"
+            className="flex-1 bg-surface-700 text-orange-300 border border-orange-500/30 py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-surface-600 disabled:opacity-50 transition-colors"
           >
             Request Revisions
           </button>
@@ -91,7 +91,7 @@ export default function ApprovalWorkflow({
             onChange={(e) => setFeedback(e.target.value)}
             placeholder="Describe what changes are needed..."
             rows={3}
-            className="w-full px-4 py-2.5 border border-orange-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none text-gray-900 resize-y"
+            className="w-full px-4 py-2.5 bg-surface-700 border border-orange-500/30 rounded-lg text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none text-white placeholder-gray-500 resize-y"
           />
           <div className="flex gap-3">
             <button
@@ -106,7 +106,7 @@ export default function ApprovalWorkflow({
                 setShowRevisionForm(false);
                 setFeedback("");
               }}
-              className="px-4 py-2.5 text-sm text-gray-600 hover:text-gray-800"
+              className="px-4 py-2.5 text-sm text-gray-400 hover:text-gray-200"
             >
               Cancel
             </button>

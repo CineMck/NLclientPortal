@@ -14,6 +14,7 @@ export async function GET() {
   }
 
   const userId = (session.user as { id?: string }).id;
+  const companyId = (session.user as { companyId?: string | null }).companyId;
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
@@ -24,17 +25,23 @@ export async function GET() {
         );
       };
 
-      // Send initial heartbeat
       sendEvent({ type: "connected" });
 
       const poll = async () => {
         try {
           const db = getDb();
+
+          // Scope tasks to company or individual user
+          const whereClause = companyId
+            ? "t.user_id IN (SELECT id FROM users WHERE company_id = ?) AND t.clickup_task_id IS NOT NULL"
+            : "t.user_id = ? AND t.clickup_task_id IS NOT NULL";
+          const param = companyId || userId;
+
           const tasks = db
             .prepare(
-              "SELECT id, clickup_task_id, clickup_status FROM tasks WHERE user_id = ? AND clickup_task_id IS NOT NULL"
+              `SELECT t.id, t.clickup_task_id, t.clickup_status FROM tasks t WHERE ${whereClause}`
             )
-            .all(userId) as Array<{
+            .all(param) as Array<{
             id: number;
             clickup_task_id: string;
             clickup_status: string;
@@ -46,7 +53,6 @@ export async function GET() {
               const newStatus = clickupTask.status?.status;
 
               if (newStatus && newStatus !== task.clickup_status) {
-                // Record in status history
                 db.prepare(
                   "INSERT INTO status_history (task_id, old_status, new_status) VALUES (?, ?, ?)"
                 ).run(task.id, task.clickup_status, newStatus);
@@ -55,7 +61,6 @@ export async function GET() {
                   "UPDATE tasks SET clickup_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
                 ).run(newStatus, task.id);
 
-                // Send email notification
                 checkAndNotifyStatusChanges(task.id, task.clickup_status, newStatus);
 
                 sendEvent({
@@ -76,13 +81,9 @@ export async function GET() {
         }
       };
 
-      // Poll every 30 seconds
       const interval = setInterval(poll, 30000);
-
-      // Initial poll
       await poll();
 
-      // Cleanup when client disconnects
       const checkConnection = setInterval(() => {
         try {
           sendEvent({ type: "heartbeat", timestamp: Date.now() });

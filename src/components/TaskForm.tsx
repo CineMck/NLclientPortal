@@ -63,47 +63,47 @@ export default function TaskForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+        <div className="bg-red-900/30 border border-red-700/50 text-red-400 px-4 py-3 rounded-lg text-sm">
           {error}
         </div>
       )}
 
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-          Task / Project Name <span className="text-red-500">*</span>
+        <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-1">
+          Task / Project Name <span className="text-red-400">*</span>
         </label>
         <input
           type="text"
           id="title"
           name="title"
           required
-          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors text-gray-900"
+          className="w-full px-4 py-2.5 bg-surface-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors text-white placeholder-gray-500"
           placeholder="e.g., Website redesign, Video editing project..."
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
-          <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="dueDate" className="block text-sm font-medium text-gray-300 mb-1">
             Due Date
           </label>
           <input
             type="date"
             id="dueDate"
             name="dueDate"
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors text-gray-900"
+            className="w-full px-4 py-2.5 bg-surface-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors text-white"
           />
         </div>
 
         <div>
-          <label htmlFor="urgency" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="urgency" className="block text-sm font-medium text-gray-300 mb-1">
             Level of Urgency
           </label>
           <select
             id="urgency"
             name="urgency"
             defaultValue="medium"
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors text-gray-900 bg-white"
+            className="w-full px-4 py-2.5 bg-surface-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors text-white"
           >
             <option value="low">Low - No rush</option>
             <option value="medium">Medium - Standard timeline</option>
@@ -114,23 +114,23 @@ export default function TaskForm() {
       </div>
 
       <div>
-        <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="notes" className="block text-sm font-medium text-gray-300 mb-1">
           Notes / Description
         </label>
         <textarea
           id="notes"
           name="notes"
           rows={5}
-          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors text-gray-900 resize-y"
+          className="w-full px-4 py-2.5 bg-surface-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors text-white placeholder-gray-500 resize-y"
           placeholder="Describe what you need done, any specific requirements, references, etc."
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-300 mb-1">
           Attachments
         </label>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-brand-400 transition-colors">
+        <div className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-brand-500/50 transition-colors">
           <input
             type="file"
             ref={fileInputRef}
@@ -140,11 +140,11 @@ export default function TaskForm() {
             id="file-upload"
           />
           <label htmlFor="file-upload" className="cursor-pointer">
-            <svg className="mx-auto h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="mx-auto h-10 w-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
-            <p className="mt-2 text-sm text-gray-600">
-              <span className="text-brand-600 font-medium">Click to upload</span> or drag and drop
+            <p className="mt-2 text-sm text-gray-400">
+              <span className="text-brand-400 font-medium">Click to upload</span> or drag and drop
             </p>
             <p className="text-xs text-gray-500 mt-1">Any file type up to 10MB</p>
           </label>
@@ -155,13 +155,13 @@ export default function TaskForm() {
             {selectedFiles.map((file, index) => (
               <li
                 key={index}
-                className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 text-sm"
+                className="flex items-center justify-between bg-surface-700 rounded-lg px-3 py-2 text-sm"
               >
-                <span className="text-gray-700 truncate">{file.name}</span>
+                <span className="text-gray-300 truncate">{file.name}</span>
                 <button
                   type="button"
                   onClick={() => removeFile(index)}
-                  className="text-gray-400 hover:text-red-500 ml-2"
+                  className="text-gray-500 hover:text-red-400 ml-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -176,7 +176,7 @@ export default function TaskForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-brand-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-brand-700 focus:ring-4 focus:ring-brand-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        className="w-full bg-brand-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-brand-700 focus:ring-4 focus:ring-brand-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
       >
         {loading ? "Submitting..." : "Submit Request"}
       </button>

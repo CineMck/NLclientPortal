@@ -25,6 +25,8 @@ export const authOptions: NextAuthOptions = {
           email: string;
           password: string;
           company: string | null;
+          company_id: number | null;
+          role: string;
         } | undefined;
 
         if (!user) {
@@ -41,6 +43,8 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           email: user.email,
           company: user.company,
+          companyId: user.company_id ? String(user.company_id) : null,
+          role: user.role,
         };
       },
     }),
@@ -53,6 +57,8 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.company = (user as { company?: string }).company;
+        token.companyId = (user as { companyId?: string | null }).companyId;
+        token.role = (user as { role?: string }).role;
       }
       return token;
     },
@@ -60,6 +66,8 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         (session.user as { id?: string }).id = token.id as string;
         (session.user as { company?: string }).company = token.company as string;
+        (session.user as { companyId?: string | null }).companyId = token.companyId as string | null;
+        (session.user as { role?: string }).role = token.role as string;
       }
       return session;
     },
