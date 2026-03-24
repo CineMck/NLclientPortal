@@ -36,6 +36,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  let clickupTaskId: string | null = null;
+
   try {
     const formData = await request.formData();
     const title = formData.get("title") as string;
@@ -55,7 +57,6 @@ export async function POST(request: NextRequest) {
     const userId = (session.user as { id?: string }).id;
 
     // Create task in ClickUp
-    let clickupTaskId: string | null = null;
     try {
       const clickupTask = await createClickUpTask({
         title,
@@ -88,6 +89,7 @@ export async function POST(request: NextRequest) {
     const taskId = result.lastInsertRowid;
 
     // Handle file uploads
+    const failedAttachments: string[] = [];
     if (files.length > 0) {
       const uploadDir = path.join(process.cwd(), "uploads", String(taskId));
       await mkdir(uploadDir, { recursive: true });
@@ -95,36 +97,54 @@ export async function POST(request: NextRequest) {
       for (const file of files) {
         if (file.size === 0) continue;
 
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const filePath = path.join(uploadDir, file.name);
-        await writeFile(filePath, buffer);
+        try {
+          const bytes = await file.arrayBuffer();
+          const buffer = Buffer.from(bytes);
+          const filePath = path.join(uploadDir, file.name);
+          await writeFile(filePath, buffer);
 
-        db.prepare(
-          "INSERT INTO attachments (task_id, filename, filepath, mimetype) VALUES (?, ?, ?, ?)"
-        ).run(Number(taskId), file.name, filePath, file.type);
+          db.prepare(
+            "INSERT INTO attachments (task_id, filename, filepath, mimetype) VALUES (?, ?, ?, ?)"
+          ).run(Number(taskId), file.name, filePath, file.type);
 
-        // Upload to ClickUp if task was created there
-        if (clickupTaskId) {
-          try {
-            await uploadAttachmentToClickUp(clickupTaskId, filePath, file.name);
-          } catch (err) {
-            console.error("Failed to upload attachment to ClickUp:", err);
+          // Upload to ClickUp if task was created there
+          if (clickupTaskId) {
+            try {
+              await uploadAttachmentToClickUp(clickupTaskId, filePath, file.name);
+            } catch (err) {
+              console.error("Failed to upload attachment to ClickUp:", err);
+            }
           }
+        } catch (err) {
+          console.error(`Failed to process attachment ${file.name}:`, err);
+          failedAttachments.push(file.name);
         }
       }
     }
 
     return NextResponse.json(
       {
-        message: "Task created successfully",
+        message: failedAttachments.length > 0
+          ? `Task created, but some attachments failed to upload: ${failedAttachments.join(", ")}`
+          : "Task created successfully",
         taskId: Number(taskId),
         clickupTaskId,
+        failedAttachments,
       },
       { status: 201 }
     );
   } catch (error) {
     console.error("Task creation error:", error);
+    // If ClickUp task was already created, let the user know the task exists there
+    if (clickupTaskId) {
+      return NextResponse.json(
+        {
+          error: "Task was created in ClickUp but failed to save locally. Please contact support.",
+          clickupTaskId,
+        },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
       { error: "Failed to create task" },
       { status: 500 }
