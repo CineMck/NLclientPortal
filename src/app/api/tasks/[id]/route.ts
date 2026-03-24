@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import getDb from "@/lib/db";
 import { getClickUpTask } from "@/lib/clickup";
+import { checkAndNotifyStatusChanges } from "@/lib/notifications";
 
 export async function GET(
   request: NextRequest,
@@ -35,13 +36,29 @@ export async function GET(
       const newStatus = clickupTask.status?.status || task.clickup_status;
 
       if (newStatus !== task.clickup_status) {
+        // Record status change in history
+        db.prepare(
+          "INSERT INTO status_history (task_id, old_status, new_status) VALUES (?, ?, ?)"
+        ).run(task.id, task.clickup_status, newStatus);
+
         db.prepare(
           "UPDATE tasks SET clickup_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
         ).run(newStatus, task.id);
+
+        // Send email notification
+        checkAndNotifyStatusChanges(task.id, task.clickup_status || "open", newStatus);
       }
 
+      const attachments = db
+        .prepare("SELECT id, filename, mimetype, filepath FROM attachments WHERE task_id = ?")
+        .all(task.id);
+
+      const statusHistory = db
+        .prepare("SELECT * FROM status_history WHERE task_id = ? ORDER BY changed_at DESC")
+        .all(task.id);
+
       return NextResponse.json({
-        task: { ...task, clickup_status: newStatus },
+        task: { ...task, clickup_status: newStatus, attachments, statusHistory },
       });
     } catch (error) {
       console.error("Failed to fetch ClickUp task status:", error);
@@ -49,8 +66,12 @@ export async function GET(
   }
 
   const attachments = db
-    .prepare("SELECT id, filename, mimetype FROM attachments WHERE task_id = ?")
+    .prepare("SELECT id, filename, mimetype, filepath FROM attachments WHERE task_id = ?")
     .all(task.id);
 
-  return NextResponse.json({ task: { ...task, attachments } });
+  const statusHistory = db
+    .prepare("SELECT * FROM status_history WHERE task_id = ? ORDER BY changed_at DESC")
+    .all(task.id);
+
+  return NextResponse.json({ task: { ...task, attachments, statusHistory } });
 }

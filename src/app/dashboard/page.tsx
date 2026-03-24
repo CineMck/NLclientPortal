@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import TaskList from "@/components/TaskList";
+import DashboardAnalytics from "@/components/DashboardAnalytics";
 import Link from "next/link";
 
 export default async function DashboardPage() {
@@ -33,6 +34,7 @@ export default async function DashboardPage() {
             New Request
           </Link>
         </div>
+        <DashboardAnalytics />
         <TaskList />
       </main>
     </div>

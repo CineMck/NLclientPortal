@@ -90,3 +90,55 @@ export async function uploadAttachmentToClickUp(
 
   return response.ok;
 }
+
+export async function getClickUpTaskComments(taskId: string) {
+  const response = await fetch(
+    `${CLICKUP_API_BASE}/task/${taskId}/comment`,
+    { headers: getHeaders() }
+  );
+
+  if (!response.ok) {
+    throw new Error(`ClickUp API error: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function createClickUpComment(
+  taskId: string,
+  commentText: string
+) {
+  const response = await fetch(
+    `${CLICKUP_API_BASE}/task/${taskId}/comment`,
+    {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({ comment_text: commentText }),
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`ClickUp API error: ${response.status} - ${error}`);
+  }
+
+  return response.json();
+}
+
+export async function updateClickUpTaskStatus(
+  taskId: string,
+  status: string
+) {
+  const response = await fetch(`${CLICKUP_API_BASE}/task/${taskId}`, {
+    method: "PUT",
+    headers: getHeaders(),
+    body: JSON.stringify({ status }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`ClickUp API error: ${response.status} - ${error}`);
+  }
+
+  return response.json();
+}

@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import TaskFilters from "./TaskFilters";
+import { useSSE } from "@/hooks/useSSE";
 
 interface Task {
   id: number;
@@ -31,10 +34,36 @@ const URGENCY_COLORS: Record<string, string> = {
   urgent: "bg-red-100 text-red-700",
 };
 
+const URGENCY_ORDER: Record<string, number> = {
+  urgent: 0,
+  high: 1,
+  medium: 2,
+  low: 3,
+};
+
 export default function TaskList() {
+  const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState<number | null>(null);
+
+  // Filters
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [urgencyFilter, setUrgencyFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
+
+  // Real-time updates via SSE
+  useSSE((event) => {
+    if (event.type === "status_update" && event.taskId && event.newStatus) {
+      setTasks((prev) =>
+        prev.map((t) =>
+          t.id === event.taskId
+            ? { ...t, clickup_status: event.newStatus! }
+            : t
+        )
+      );
+    }
+  });
 
   useEffect(() => {
     fetchTasks();
@@ -52,26 +81,64 @@ export default function TaskList() {
     }
   }
 
-  async function refreshStatus(taskId: number) {
-    setRefreshing(taskId);
-    try {
-      const res = await fetch(`/api/tasks/${taskId}`);
-      const data = await res.json();
-      if (data.task) {
-        setTasks((prev) =>
-          prev.map((t) =>
-            t.id === taskId
-              ? { ...t, clickup_status: data.task.clickup_status }
-              : t
-          )
-        );
-      }
-    } catch (err) {
-      console.error("Failed to refresh status:", err);
-    } finally {
-      setRefreshing(null);
+  // Filter and sort tasks
+  const filteredTasks = useMemo(() => {
+    let result = [...tasks];
+
+    // Search
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (t) =>
+          t.title.toLowerCase().includes(q) ||
+          (t.notes && t.notes.toLowerCase().includes(q))
+      );
     }
-  }
+
+    // Status filter
+    if (statusFilter !== "all") {
+      result = result.filter(
+        (t) => t.clickup_status?.toLowerCase() === statusFilter
+      );
+    }
+
+    // Urgency filter
+    if (urgencyFilter !== "all") {
+      result = result.filter((t) => t.urgency === urgencyFilter);
+    }
+
+    // Sort
+    switch (sortBy) {
+      case "oldest":
+        result.sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+        break;
+      case "urgency":
+        result.sort(
+          (a, b) =>
+            (URGENCY_ORDER[a.urgency] ?? 4) - (URGENCY_ORDER[b.urgency] ?? 4)
+        );
+        break;
+      case "due_date":
+        result.sort((a, b) => {
+          if (!a.due_date) return 1;
+          if (!b.due_date) return -1;
+          return (
+            new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+          );
+        });
+        break;
+      default: // newest
+        result.sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+    }
+
+    return result;
+  }, [tasks, search, statusFilter, urgencyFilter, sortBy]);
 
   if (loading) {
     return (
@@ -96,73 +163,98 @@ export default function TaskList() {
   }
 
   return (
-    <div className="space-y-4">
-      {tasks.map((task) => (
-        <div
-          key={task.id}
-          className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow"
-        >
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-gray-900 text-base">
-                {task.title}
-              </h3>
-              {task.notes && (
-                <p className="mt-1 text-sm text-gray-500 line-clamp-2">
-                  {task.notes}
-                </p>
-              )}
-              <div className="flex flex-wrap items-center gap-2 mt-3">
-                <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
-                    STATUS_COLORS[task.clickup_status?.toLowerCase()] ||
-                    STATUS_COLORS["open"]
-                  }`}
+    <div>
+      <TaskFilters
+        search={search}
+        onSearchChange={setSearch}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        urgencyFilter={urgencyFilter}
+        onUrgencyFilterChange={setUrgencyFilter}
+        sortBy={sortBy}
+        onSortByChange={setSortBy}
+      />
+
+      {filteredTasks.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-sm text-gray-500">
+            No tasks match your filters.{" "}
+            <button
+              onClick={() => {
+                setSearch("");
+                setStatusFilter("all");
+                setUrgencyFilter("all");
+              }}
+              className="text-brand-600 hover:text-brand-700 font-medium"
+            >
+              Clear filters
+            </button>
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filteredTasks.map((task) => (
+            <div
+              key={task.id}
+              onClick={() => router.push(`/dashboard/tasks/${task.id}`)}
+              className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md hover:border-brand-200 transition-all cursor-pointer group"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-base group-hover:text-brand-700 transition-colors">
+                    {task.title}
+                  </h3>
+                  {task.notes && (
+                    <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+                      {task.notes}
+                    </p>
+                  )}
+                  <div className="flex flex-wrap items-center gap-2 mt-3">
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
+                        STATUS_COLORS[task.clickup_status?.toLowerCase()] ||
+                        STATUS_COLORS["open"]
+                      }`}
+                    >
+                      {task.clickup_status || "Submitted"}
+                    </span>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
+                        URGENCY_COLORS[task.urgency] || URGENCY_COLORS["medium"]
+                      }`}
+                    >
+                      {task.urgency}
+                    </span>
+                    {task.due_date && (
+                      <span className="text-xs text-gray-500">
+                        Due: {new Date(task.due_date).toLocaleDateString()}
+                      </span>
+                    )}
+                    {task.attachment_names && (
+                      <span className="text-xs text-gray-500">
+                        {task.attachment_names.split(",").length} file(s) attached
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <svg
+                  className="w-5 h-5 text-gray-300 group-hover:text-brand-500 transition-colors shrink-0 mt-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  {task.clickup_status || "Submitted"}
-                </span>
-                <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
-                    URGENCY_COLORS[task.urgency] || URGENCY_COLORS["medium"]
-                  }`}
-                >
-                  {task.urgency}
-                </span>
-                {task.due_date && (
-                  <span className="text-xs text-gray-500">
-                    Due: {new Date(task.due_date).toLocaleDateString()}
-                  </span>
-                )}
-                {task.attachment_names && (
-                  <span className="text-xs text-gray-500">
-                    {task.attachment_names.split(",").length} file(s) attached
-                  </span>
-                )}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
               </div>
             </div>
-            <button
-              onClick={() => refreshStatus(task.id)}
-              disabled={refreshing === task.id}
-              className="shrink-0 text-gray-400 hover:text-brand-600 p-1 rounded transition-colors"
-              title="Refresh status from ClickUp"
-            >
-              <svg
-                className={`w-5 h-5 ${refreshing === task.id ? "animate-spin" : ""}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-            </button>
-          </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
 }
