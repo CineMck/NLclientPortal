@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
 
         const db = getDb();
         const user = db
-          .prepare("SELECT * FROM users WHERE email = ?")
+          .prepare("SELECT * FROM users WHERE email = ? COLLATE NOCASE")
           .get(credentials.email) as {
           id: number;
           name: string;
