@@ -83,6 +83,7 @@ db.exec(`
 `);
 
 const adminPassword = bcrypt.hashSync("admin123", 10);
+const lukePassword = bcrypt.hashSync("Lmck1922!$", 10);
 const demoPassword = bcrypt.hashSync("demo123", 10);
 
 // Create a demo company
@@ -106,6 +107,17 @@ if (!existingAdmin) {
   console.log("Admin user created: admin@neuluma.com / admin123");
 } else {
   console.log("Admin user already exists.");
+}
+
+// Create Luke McKay admin user
+const existingLuke = db.prepare("SELECT id FROM users WHERE email = ?").get("luke@neuluma.com");
+if (!existingLuke) {
+  db.prepare(
+    "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)"
+  ).run("Luke McKay", "luke@neuluma.com", lukePassword, "admin");
+  console.log("Admin user created: luke@neuluma.com");
+} else {
+  console.log("Luke McKay admin user already exists.");
 }
 
 // Create demo client user
