@@ -21,13 +21,16 @@ export async function createClickUpTask(task: {
   notes?: string;
 }) {
   const listId = process.env.CLICKUP_LIST_ID;
-  const assigneeId = process.env.CLICKUP_ASSIGNEE_ID;
+  const assigneeIds = process.env.CLICKUP_ASSIGNEE_IDS || "";
 
   const body: Record<string, unknown> = {
     name: task.title,
     description: task.notes || "",
-    assignees: assigneeId ? [parseInt(assigneeId)] : [],
+    assignees: assigneeIds
+      ? assigneeIds.split(",").map((id) => parseInt(id.trim()))
+      : [],
     priority: URGENCY_TO_PRIORITY[task.urgency] || 3,
+    status: "pending",
   };
 
   if (task.dueDate) {

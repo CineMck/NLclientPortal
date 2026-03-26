@@ -55,10 +55,12 @@ export default function TaskFilters({
           className="px-3 py-2 bg-surface-700 border border-gray-600 rounded-lg text-sm text-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
         >
           <option value="all">All Statuses</option>
+          <option value="pending">Pending</option>
           <option value="to do">To Do</option>
           <option value="open">Open</option>
           <option value="in progress">In Progress</option>
           <option value="in review">In Review</option>
+          <option value="needs revisions">Needs Revisions</option>
           <option value="complete">Complete</option>
           <option value="closed">Closed</option>
         </select>

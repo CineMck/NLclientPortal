@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
         urgency || "medium",
         notes || null,
         clickupTaskId,
-        "to do"
+        "pending"
       );
 
     const taskId = result.lastInsertRowid;

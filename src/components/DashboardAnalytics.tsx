@@ -12,20 +12,24 @@ interface Analytics {
 }
 
 const STATUS_LABELS: Record<string, string> = {
+  pending: "Pending",
   "to do": "To Do",
   open: "Open",
   "in progress": "In Progress",
   "in review": "In Review",
+  "needs revisions": "Needs Revisions",
   complete: "Complete",
   closed: "Closed",
   done: "Done",
 };
 
 const STATUS_COLORS: Record<string, string> = {
+  pending: "bg-gray-500",
   "to do": "bg-gray-500",
   open: "bg-gray-500",
   "in progress": "bg-blue-500",
   "in review": "bg-yellow-500",
+  "needs revisions": "bg-orange-500",
   complete: "bg-green-500",
   closed: "bg-green-500",
   done: "bg-green-500",
