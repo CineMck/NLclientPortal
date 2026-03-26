@@ -82,32 +82,18 @@ db.exec(`
   );
 `);
 
-const adminPassword = bcrypt.hashSync("admin123", 10);
-const lukePassword = bcrypt.hashSync("Lmck1922!$", 10);
-const demoPassword = bcrypt.hashSync("demo123", 10);
+// Clear all existing users and related data
+db.exec(`
+  DELETE FROM notification_preferences;
+  DELETE FROM comments;
+  DELETE FROM status_history;
+  DELETE FROM attachments;
+  DELETE FROM tasks;
+  DELETE FROM users;
+`);
+console.log("Cleared all existing users and related data.");
 
-// Create a demo company
-const existingCompany = db.prepare("SELECT id FROM companies WHERE name = ?").get("Demo Company");
-let companyId: number;
-if (!existingCompany) {
-  const result = db.prepare("INSERT INTO companies (name) VALUES (?)").run("Demo Company");
-  companyId = Number(result.lastInsertRowid);
-  console.log("Demo company created: Demo Company");
-} else {
-  companyId = (existingCompany as { id: number }).id;
-  console.log("Demo company already exists.");
-}
-
-// Create admin user
-const existingAdmin = db.prepare("SELECT id FROM users WHERE email = ?").get("admin@neuluma.com");
-if (!existingAdmin) {
-  db.prepare(
-    "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)"
-  ).run("Admin", "admin@neuluma.com", adminPassword, "admin");
-  console.log("Admin user created: admin@neuluma.com / admin123");
-} else {
-  console.log("Admin user already exists.");
-}
+const lukePassword = bcrypt.hashSync("TempPass123!", 10);
 
 // Create Luke McKay admin user
 const existingLuke = db.prepare("SELECT id FROM users WHERE email = ?").get("luke@neuluma.com");
@@ -115,20 +101,9 @@ if (!existingLuke) {
   db.prepare(
     "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)"
   ).run("Luke McKay", "luke@neuluma.com", lukePassword, "admin");
-  console.log("Admin user created: luke@neuluma.com");
+  console.log("Admin user created: luke@neuluma.com / TempPass123!");
 } else {
   console.log("Luke McKay admin user already exists.");
-}
-
-// Create demo client user
-const existingDemo = db.prepare("SELECT id FROM users WHERE email = ?").get("demo@example.com");
-if (!existingDemo) {
-  db.prepare(
-    "INSERT INTO users (name, email, password, company, company_id, role) VALUES (?, ?, ?, ?, ?, ?)"
-  ).run("Demo Client", "demo@example.com", demoPassword, "Demo Company", companyId, "client");
-  console.log("Demo user created: demo@example.com / demo123");
-} else {
-  console.log("Demo user already exists.");
 }
 
 db.close();
