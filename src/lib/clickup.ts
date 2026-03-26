@@ -142,3 +142,43 @@ export async function updateClickUpTaskStatus(
 
   return response.json();
 }
+
+export async function updateClickUpTask(
+  taskId: string,
+  updates: { name?: string; description?: string; priority?: number }
+) {
+  const response = await fetch(`${CLICKUP_API_BASE}/task/${taskId}`, {
+    method: "PUT",
+    headers: getHeaders(),
+    body: JSON.stringify(updates),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`ClickUp API error: ${response.status} - ${error}`);
+  }
+
+  return response.json();
+}
+
+export async function deleteClickUpTask(taskId: string): Promise<boolean> {
+  try {
+    const response = await fetch(`${CLICKUP_API_BASE}/task/${taskId}`, {
+      method: "DELETE",
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error(`Failed to delete ClickUp task: ${error}`);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Failed to delete ClickUp task:", error);
+    return false;
+  }
+}
+
+export { URGENCY_TO_PRIORITY };

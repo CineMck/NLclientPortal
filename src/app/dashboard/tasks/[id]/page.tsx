@@ -7,6 +7,8 @@ import CommentSection from "@/components/CommentSection";
 import FilePreview from "@/components/FilePreview";
 import ApprovalWorkflow from "@/components/ApprovalWorkflow";
 import StatusHistory from "@/components/StatusHistory";
+import EditTaskModal from "@/components/EditTaskModal";
+import DeleteTaskButton from "@/components/DeleteTaskButton";
 import Link from "next/link";
 
 interface Attachment {
@@ -43,6 +45,7 @@ const STATUS_COLORS: Record<string, string> = {
   "to do": "bg-gray-800 text-gray-300",
   "in progress": "bg-blue-900/50 text-blue-300",
   "in review": "bg-yellow-900/50 text-yellow-300",
+  "needs revisions": "bg-orange-900/50 text-orange-300",
   complete: "bg-green-900/50 text-green-300",
   closed: "bg-green-900/50 text-green-300",
   done: "bg-green-900/50 text-green-300",
@@ -62,6 +65,7 @@ export default function TaskDetailPage() {
   const taskId = params.id as string;
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   const fetchTask = useCallback(async () => {
     try {
@@ -138,6 +142,17 @@ export default function TaskDetailPage() {
           <div className="flex items-start justify-between gap-4 mb-4">
             <h1 className="text-2xl font-bold text-white">{task.title}</h1>
             <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => setEditModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-brand-400 bg-brand-900/20 border border-brand-700/30 rounded-lg hover:bg-brand-900/40 transition-colors"
+                title="Edit request"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Edit
+              </button>
+              <DeleteTaskButton taskId={task.id} />
               <span
                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium capitalize ${
                   STATUS_COLORS[task.clickup_status?.toLowerCase()] ||
@@ -229,6 +244,17 @@ export default function TaskDetailPage() {
           <CommentSection taskId={task.id} />
         </div>
       </main>
+
+      {/* Edit Modal */}
+      <EditTaskModal
+        task={task}
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSaved={() => {
+          setEditModalOpen(false);
+          fetchTask();
+        }}
+      />
     </div>
   );
 }

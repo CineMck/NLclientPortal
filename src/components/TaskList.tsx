@@ -22,6 +22,7 @@ const STATUS_COLORS: Record<string, string> = {
   "to do": "bg-gray-800 text-gray-300",
   "in progress": "bg-blue-900/50 text-blue-300",
   "in review": "bg-yellow-900/50 text-yellow-300",
+  "needs revisions": "bg-orange-900/50 text-orange-300",
   "complete": "bg-green-900/50 text-green-300",
   "closed": "bg-green-900/50 text-green-300",
   "done": "bg-green-900/50 text-green-300",

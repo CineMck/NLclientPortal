@@ -36,7 +36,7 @@ export async function POST(
   }
 
   const isApproval = action === "approve";
-  const newStatus = isApproval ? "complete" : "in progress";
+  const newStatus = isApproval ? "complete" : "needs revisions";
   const oldStatus = task.clickup_status;
 
   // Record status change
