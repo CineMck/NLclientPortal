@@ -63,12 +63,16 @@ export async function POST(
   if (task.clickup_task_id) {
     try {
       await updateClickUpTaskStatus(task.clickup_task_id, newStatus);
+    } catch (error) {
+      console.error("Failed to sync status to ClickUp:", error);
+    }
+    try {
       await createClickUpComment(
         task.clickup_task_id,
         `[Portal - ${userName}]: ${commentContent}`
       );
     } catch (error) {
-      console.error("Failed to sync approval to ClickUp:", error);
+      console.error("Failed to post comment to ClickUp:", error);
     }
   }
 
