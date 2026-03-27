@@ -19,7 +19,7 @@ export default function ApprovalWorkflow({
 
   const status = currentStatus?.toLowerCase();
   const isCompleted = ["complete", "closed", "done"].includes(status || "");
-  const isNeedsRevisions = status === "needs revisions";
+  const isNeedsRevisions = status === "revisions needed";
 
   async function handleAction(action: "approve" | "request_revisions") {
     setSubmitting(true);

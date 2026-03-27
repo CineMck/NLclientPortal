@@ -60,7 +60,7 @@ export default function TaskFilters({
           <option value="open">Open</option>
           <option value="in progress">In Progress</option>
           <option value="in review">In Review</option>
-          <option value="needs revisions">Needs Revisions</option>
+          <option value="revisions needed">Revisions Needed</option>
           <option value="complete">Complete</option>
           <option value="closed">Closed</option>
         </select>
